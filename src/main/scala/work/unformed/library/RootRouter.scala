@@ -25,10 +25,13 @@ class RootRouter extends LazyLogging {
   import JsonUtil._
 
   private def exceptionHandler: ExceptionHandler = ExceptionHandler {
-    case e: RepositoryError => complete(e.httpCode, e.response)
+    case e: RepositoryError =>
+      logger.warn("Repository error #{}: {}", e.code, e.message)
+      complete(e.httpCode, e.response)
     case e: Exception =>
-      logger.error("Exception: ", e)
-      complete(StatusCodes.InternalServerError)
+      logger.error("Exception: {}", e.getMessage)
+      logger.warn("Exception: ", e)
+      complete(StatusCodes.InternalServerError, e)
   }
 
   private def healthRoute: Route = get {

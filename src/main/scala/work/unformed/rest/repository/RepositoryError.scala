@@ -4,11 +4,11 @@ import akka.http.scaladsl.model.{StatusCode, StatusCodes}
 
 abstract class RepositoryError
 (
-  val responseCode: Int,
+  val code: Int,
   val message: String,
   val httpCode: StatusCode = StatusCodes.InternalServerError
 ) extends RuntimeException(message) {
-  def response: ErrorResponse = ErrorResponse(responseCode, message)
+  def response: ErrorResponse = ErrorResponse(code, message)
 }
 
 case class ErrorResponse(code: Int, message: String)
@@ -23,7 +23,7 @@ class InvalidUpdateKey(oldValue: Any, newValue: Any)
   extends RepositoryError(2, s"Products $oldValue and $newValue have different key fields", StatusCodes.Conflict)
 
 class NothingToUpdate
-  extends RepositoryError(3, s"Nothing to update", StatusCodes.NoContent)
+  extends RepositoryError(3, s"Nothing to update", StatusCodes.Conflict)
 
 class ConflictOnDelete
   extends RepositoryError(4, s"Entity was changed", StatusCodes.Conflict)
