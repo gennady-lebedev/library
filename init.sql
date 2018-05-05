@@ -5,12 +5,12 @@ USE library;
 CREATE TABLE items (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL,
-  comment TEXT,
-  changed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  optional_comment TEXT,
+  last_time_changed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (ID)
 );
 
-INSERT INTO items (id, name, comment) VALUES
+INSERT INTO items (id, name, optional_comment) VALUES
   (1, 'sample', 'sample\'s comment'),
   (2, 'example', 'example\'s comment'),
   (3, 'something', null),

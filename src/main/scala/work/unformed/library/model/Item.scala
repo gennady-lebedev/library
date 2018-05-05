@@ -1,21 +1,18 @@
 package work.unformed.library.model
 
 import java.sql.Timestamp
-import java.time.LocalDateTime
-
-import work.unformed.rest.meta.{Auto, Key, MetaCompanion, RepositorySupport}
+import work.unformed.rest.meta._
 
 case class Item
 (
-  @Key @Auto id: Int = -1,
+  @Key @Auto id: Long = Defaults.long,
   name: String,
   optionalComment: Option[String],
-  @Auto lastTimeChanged: Timestamp = Timestamp.valueOf(LocalDateTime.now())
+  @Auto lastTimeChanged: Timestamp = Defaults.timestamp
 )
 
 object Item extends MetaCompanion[Item] {
   def meta: RepositorySupport[Item] = new RepositorySupport[Item] {
     override def table: String = "items"
-    override def columns: Seq[String] = Seq("id", "name", "comment", "changed")
   }
 }
