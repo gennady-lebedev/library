@@ -8,10 +8,11 @@ import work.unformed.library.model.Item
 import work.unformed.rest.JsonUtil
 import work.unformed.rest.meta.Query
 import work.unformed.rest.repository.{ConflictOnDelete, NothingToUpdate, RepositoryItemNotFound}
-import io.circe.generic.auto._
+import io.circe.generic.extras.auto._
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import JsonUtil._
 
-object ItemRouter extends JsonUtil {
+object ItemRouter {
   lazy val routes: Route = metaRoute ~ collectionRoutes ~ itemRoutes
 
   private val metaRoute: Route = path("items" / "meta") {

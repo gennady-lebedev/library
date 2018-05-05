@@ -1,13 +1,15 @@
 package work.unformed.rest
 
 import io.circe.Decoder.Result
+import io.circe.generic.extras.Configuration
 import io.circe._
 import work.unformed.rest.meta.{Asc, Desc, Filter, Sort}
 import java.sql.{Date, Time, Timestamp}
 
 import scala.reflect.runtime.universe._
 
-trait JsonUtil {
+object JsonUtil {
+  implicit val configuration: Configuration = Configuration.default.withDefaults.withKebabCaseConstructorNames.withKebabCaseMemberNames
   implicit val printer: Printer = Printer.noSpaces.copy(dropNullValues = true)
 
 

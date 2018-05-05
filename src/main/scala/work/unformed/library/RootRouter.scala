@@ -6,10 +6,8 @@ import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.rest.JsonUtil
 import work.unformed.rest.repository.RepositoryError
-import io.circe.generic.auto._
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 
-class RootRouter extends JsonUtil with LazyLogging {
+class RootRouter extends LazyLogging {
 
   val routes: Route = handleExceptions(exceptionHandler){
     extractUri { uri =>
@@ -21,6 +19,10 @@ class RootRouter extends JsonUtil with LazyLogging {
       }
     }
   }
+
+  import io.circe.generic.extras.auto._
+  import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+  import JsonUtil._
 
   private def exceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: RepositoryError => complete(e.httpCode, e.response)
