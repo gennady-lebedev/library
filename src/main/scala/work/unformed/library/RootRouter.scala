@@ -5,20 +5,25 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.rest.JsonUtil
+import work.unformed.rest.meta.CorsSupport
 import work.unformed.rest.repository.RepositoryError
 
-class RootRouter extends LazyLogging {
+class RootRouter extends LazyLogging with CorsSupport {
 
-  val routes: Route = handleExceptions(exceptionHandler){
-    extractUri { uri =>
-      extractMethod { method =>
-        logger.debug("{} {}", method.value, uri.toRelative.path)
-        ignoreTrailingSlash {
-          healthRoute ~ ItemRouter.routes
+  val routes: Route =
+    cors {
+      handleExceptions(exceptionHandler){
+        extractUri { uri =>
+          extractMethod { method =>
+            logger.debug("{} {}", method.value, uri.toRelative.path)
+            ignoreTrailingSlash {
+              healthRoute ~ ItemRouter.routes
+            }
+          }
         }
       }
     }
-  }
+
 
   import io.circe.generic.extras.auto._
   import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
