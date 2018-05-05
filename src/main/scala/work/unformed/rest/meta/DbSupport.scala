@@ -29,7 +29,7 @@ trait DbSupport[T <: Product] extends MetaSupport[T] {
 
   def parse(rs: WrappedResultSet): T = {
     val args = fieldNames.map { name =>
-      val (t, required) = fieldTypeMap(name)
+      val Field(t, _, required, _) = fieldTypeMap(name)
       val column = fieldsToColumns(name)
 
       if (t =:= typeOf[String]) if(required) rs.string(column) else  rs.stringOpt(column)

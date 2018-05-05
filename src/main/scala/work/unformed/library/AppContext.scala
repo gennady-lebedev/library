@@ -6,11 +6,12 @@ import work.unformed.library.model.Item
 import work.unformed.rest.repository.JdbcRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import scalikejdbc._
+import scalikejdbc.DBSession
+import work.unformed.db.JdbcSupport
 
 import scala.concurrent.ExecutionContext
 
-object AppContext extends LazyLogging {
+object AppContext extends LazyLogging with JdbcSupport {
   val config: Config = ConfigFactory.defaultApplication()
   implicit val actorSystem: ActorSystem = ActorSystem()
   implicit val executor: ExecutionContext = actorSystem.dispatcher
@@ -21,16 +22,4 @@ object AppContext extends LazyLogging {
 
   val router = new RootRouter()
 
-  def session(config: Config): DBSession = {
-    val driver = config.getString("driverClassName")
-    val url = config.getString("jdbcUrl")
-    val user = config.getString("username")
-    val password = config.getString("password")
-    Class.forName(driver)
-    ConnectionPool.singleton(url, user, password)
-    implicit val session: DBSession = AutoSession
-    sql"SELECT 1+1".execute().apply()
-    logger.debug("DB Connection started")
-    session
-  }
 }

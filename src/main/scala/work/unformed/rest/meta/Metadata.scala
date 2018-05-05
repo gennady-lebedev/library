@@ -1,8 +1,7 @@
 package work.unformed.rest.meta
 
-trait Metadata {
-  def meta: EntityMeta
-}
+import scala.reflect.runtime.universe.Type
 
-case class EntityMeta(entity: String, fields: Map[String, FieldMeta])
-case class FieldMeta(id: String, key: Boolean, `type`: String, required: Boolean)
+case class EntityMeta(entity: String, fields: Map[String, Field])
+
+case class Field(`type`: Type, isKey: Boolean, isRequired: Boolean, isAuto: Boolean)

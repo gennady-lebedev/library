@@ -7,7 +7,7 @@ import scala.reflect.runtime.universe._
 trait Filterable[T <: Product] extends MetaSupport[T] {
   def parseFilters(params: Map[String, List[String]]): Seq[Filter] = {
     fieldTypeMap.flatMap {
-      case (name, (t, _)) if params.contains(name) =>
+      case (name, Field(t, _, _, _)) if params.contains(name) =>
         val values =
           if (t =:= typeOf[String]) params(name)
           else if (t =:= typeOf[Int]) params(name).map(_.toInt)

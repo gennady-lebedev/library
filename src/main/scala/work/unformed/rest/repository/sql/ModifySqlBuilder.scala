@@ -29,7 +29,7 @@ class ModifySqlBuilder[R <: Product : TypeTag] extends LazyLogging {
   }
 
   def insert(value: R): BoundQuery = {
-    val columns = companion.columns.zipWithIndex.filterNot(c => companion.keys.contains(c._1))
+    val columns = companion.columns.zipWithIndex.filterNot(c => companion.auto.contains(c._1))
     val bindings = columns.map("{" + _._1 + "}")
 
     val q = BoundQuery(s"INSERT INTO ${companion.table}") ++ BoundQuery(
