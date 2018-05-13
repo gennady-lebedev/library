@@ -3,21 +3,15 @@ package work.unformed.rest.repository.sql
 import work.unformed.rest.meta._
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.reflect.runtime.universe._
-
 object ApiSqlBuilder {
-  def apply[T <: Product : TypeTag](table: String) = new ApiSqlBuilder[T](BoundQuery(table), Query(Page(1,0)))
-  def apply[T <: Product : TypeTag](table: String, query: Query[T]) = new ApiSqlBuilder[T](BoundQuery(table), query)
+  def apply[T <: Product](db: DBMapping[T]) = new ApiSqlBuilder[T](db, Query.default[T])
+  def apply[T <: Product](db: DBMapping[T], query: Query[T]) = new ApiSqlBuilder[T](db, query)
 }
 
-class ApiSqlBuilder[R <: Product : TypeTag](from: BoundQuery, query: Query[R]) extends LazyLogging {
+class ApiSqlBuilder[R <: Product](db: DBMapping[R], query: Query[R]) extends LazyLogging {
   private val page: Page = query.page
   private val filters: Seq[Filter] = query.filter
   private val sort: Seq[Sort] = query.sort
-
-  private lazy val universeMirror = runtimeMirror(getClass.getClassLoader)
-  private lazy val companion = universeMirror.reflectModule(typeOf[R].typeSymbol.companion.asModule).instance.asInstanceOf[MetaCompanion[R]].meta
-  private lazy val fieldsToColumns = companion.fieldsToColumns
 
   def select(): BoundQuery = {
     val select = buildSelect()
@@ -38,8 +32,8 @@ class ApiSqlBuilder[R <: Product : TypeTag](from: BoundQuery, query: Query[R]) e
     q
   }
 
-  private def buildSelect(): BoundQuery = BoundQuery(s"SELECT * FROM") ++ from
-  private def buildCount(): BoundQuery = BoundQuery(s"SELECT count(1) total FROM") ++ from
+  private def buildSelect(): BoundQuery = BoundQuery(s"SELECT * FROM") ++ BoundQuery(db.table)
+  private def buildCount(): BoundQuery = BoundQuery(s"SELECT count(1) total FROM") ++ BoundQuery(db.table)
 
   private def buildWhere(): BoundQuery = {
     if(filters.nonEmpty) {
@@ -49,7 +43,7 @@ class ApiSqlBuilder[R <: Product : TypeTag](from: BoundQuery, query: Query[R]) e
   }
 
   private def wherePart(f: Filter): BoundQuery = {
-    val column = fieldsToColumns.getOrElse(f.field, throw new RuntimeException(s"Undefined field in $f"))
+    val column = db.fieldsToColumns.getOrElse(f.field, throw new RuntimeException(s"Undefined field in $f"))
     val c = column
     f.condition match {
       case IsNull => BoundQuery(s"$c IS NULL")
@@ -82,7 +76,7 @@ class ApiSqlBuilder[R <: Product : TypeTag](from: BoundQuery, query: Query[R]) e
   }
 
   private def orderByPart(s: Sort): String = {
-    val column = fieldsToColumns.getOrElse(s.field, throw new RuntimeException(s"Undefined field in $s"))
+    val column = db.fieldsToColumns.getOrElse(s.field, throw new RuntimeException(s"Undefined field in $s"))
     if(s.order == Asc)
       column
     else

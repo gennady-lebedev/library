@@ -1,13 +1,10 @@
 package work.unformed.rest.repository.sql
 
-import scalikejdbc.{DBSession, NoExtractor, SQL, SQLBatch, WrappedResultSet}
+import scalikejdbc.{AutoSession, DBSession, NoExtractor, SQL, SQLBatch, WrappedResultSet}
 
 class Binding(val name: String, val value: Any)
 object Binding {
-  def apply(name: String, value: Any): Binding = new Binding(
-    name,
-    value
-  )
+  def apply(name: String, value: Any): Binding = new Binding(name, value)
 }
 
 case class BoundQuery(sql: String, bindings: Seq[Binding]) {
@@ -20,13 +17,13 @@ case class BoundQuery(sql: String, bindings: Seq[Binding]) {
     SQL(sql).bindByName(bindings.map(b => (Symbol(b.name), b.value)) :_*)
   }
 
-  def map[T](f: WrappedResultSet => T)(implicit session: DBSession): Seq[T] = toScalike.map(f).list().apply()
+  def map[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): Seq[T] = toScalike.map(f).list().apply()
 
-  def single[T](f: WrappedResultSet => T)(implicit session: DBSession): Option[T] = toScalike.map(f).single().apply()
+  def single[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): Option[T] = toScalike.map(f).single().apply()
 
-  def insert[T](draft: T)(implicit session: DBSession): Long = toScalike.updateAndReturnGeneratedKey(1).apply()
+  def insert[T](draft: T)(implicit session: DBSession = AutoSession): Long = toScalike.updateAndReturnGeneratedKey(1).apply()
 
-  def execute(implicit session: DBSession): Unit = toScalike.execute().apply()
+  def execute(implicit session: DBSession = AutoSession): Unit = toScalike.execute().apply()
 }
 
 object BoundQuery {

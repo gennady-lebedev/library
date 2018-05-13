@@ -10,9 +10,3 @@ case class Item
   optionalComment: Option[String],
   @Auto lastTimeChanged: Timestamp = Defaults.timestamp
 )
-
-object Item extends MetaCompanion[Item] {
-  def meta: RepositorySupport[Item] = new RepositorySupport[Item] {
-    override def table: String = "items"
-  }
-}

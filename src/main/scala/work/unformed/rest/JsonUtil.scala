@@ -3,8 +3,12 @@ package work.unformed.rest
 import io.circe.Decoder.Result
 import io.circe.generic.extras.Configuration
 import io.circe._
-import work.unformed.rest.meta.{Asc, Desc, Filter, Sort}
+import io.circe.syntax._
+import io.circe.generic.extras.auto._
+import work.unformed.rest.meta._
 import java.sql.{Date, Time, Timestamp}
+
+import work.unformed.rest.meta.Meta.Field
 
 import scala.reflect.runtime.universe._
 
@@ -31,12 +35,24 @@ object JsonUtil {
 
   implicit val typeEncoder: Encoder[Type] = new Encoder[Type] {
     override def apply(t: Type): Json = Encoder.encodeString(
-    if (t =:= typeOf[String]) "string"
-    else if (t =:= typeOf[Int] || t =:=  typeOf[Double] || t =:=  typeOf[Long] || t =:= typeOf[BigDecimal]) "number"
-    else if (t =:= typeOf[Timestamp]) "timestamp"
-    else if (t =:= typeOf[Date]) "date"
-    else if (t =:= typeOf[Time]) "time"
-    else "unknown"
+      if (t =:= typeOf[String]) "string"
+      else if (t =:= typeOf[Int] || t =:=  typeOf[Double] || t =:=  typeOf[Long] || t =:= typeOf[BigDecimal]) "number"
+      else if (t =:= typeOf[Timestamp]) "timestamp"
+      else if (t =:= typeOf[Date]) "date"
+      else if (t =:= typeOf[Time]) "time"
+      else "unknown"
     )
+  }
+
+  case class EntityMeta(entity: String, fields: Map[String, Field])
+
+  implicit def metaEncoder[T <: Product]: Encoder[Meta[T]] = new Encoder[Meta[T]] {
+    override def apply(a: Meta[T]): Json = Encoder.encodeJson{
+      val f = a.fieldMap.flatMap {
+        case (name, field) => Some(name, field)
+        case _ => None
+      }
+      EntityMeta(a.entity, f).asJson
+    }
   }
 }

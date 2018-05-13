@@ -1,8 +1,17 @@
 package work.unformed.rest.meta
 
-case class Query[P <: Product](page: Page = Page(100, 0), filter: Seq[Filter] = Seq.empty, sort: Seq[Sort] = Seq.empty)
+case class Query[P <: Product](page: Page = Page(), filter: Seq[Filter] = Seq.empty, sort: Seq[Sort] = Seq.empty)
 
-case class Page(limit: Int, offset: Int)
+object Query {
+  def default[P <: Product]: Query[P] = Query()
+}
+
+case class Page(limit: Int = Page.defaultLimit, offset: Int = Page.defaultOffset)
+
+object Page {
+  val defaultLimit = 50
+  val defaultOffset = 0
+}
 
 case class Filter(field: String, condition: Predicate) {
   override def toString: String = condition match {
@@ -52,5 +61,5 @@ object Result {
     new Result(result, query.filter, query.sort, total, query.page.limit, query.page.offset)
 
   def apply[P <: Product](result: Seq[P], total: Int): Result[P] =
-    new Result(result, Seq.empty, Seq.empty, total, 1, 0)
+    new Result(result, Seq.empty, Seq.empty, total, Page.defaultLimit, Page.defaultOffset)
 }

@@ -3,20 +3,19 @@ package work.unformed.library
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.extras.auto._
 import work.unformed.library.AppContext.itemsRepository
 import work.unformed.library.model.Item
-import work.unformed.rest.JsonUtil
-import work.unformed.rest.meta.{Query, QuerySupport}
-import io.circe.generic.extras.auto._
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-import JsonUtil._
+import work.unformed.rest.JsonUtil._
+import work.unformed.rest.meta.{Meta, QuerySupport}
 
-object ItemRouter extends QuerySupport[Item] {
+class ItemRouter(implicit meta: Meta[Item]) extends QuerySupport[Item] {
   lazy val routes: Route = metaRoute ~ collectionRoutes ~ itemRoutes
 
   private val metaRoute: Route = path("items" / "meta") {
     get {
-      complete(Item.meta.meta)
+      complete(meta)
     }
   }
 
