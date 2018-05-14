@@ -1,4 +1,4 @@
-package work.unformed.rest.meta
+package work.unformed.rest
 
 import akka.http.scaladsl.model.HttpMethods
 import akka.http.scaladsl.server.Directive0

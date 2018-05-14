@@ -17,11 +17,9 @@ class ApiSqlBuilder[R <: Product](db: DBMapping[R], query: Query[R]) extends Laz
     val select = buildSelect()
     val where = buildWhere()
     val orderBy = buildOrderBy()
+    val paging = BoundQuery("LIMIT {limit} OFFSET {offset}", Seq(Binding("limit", page.limit), Binding("offset", page.offset)))
 
-    val q = BoundQuery(
-      s"${(select ++ where ++ orderBy).sql} LIMIT {limit} OFFSET {offset}",
-      (select ++ where ++ orderBy).bindings ++ List(Binding("limit", page.limit), Binding("offset", page.offset))
-    )
+    val q = select ++ where ++ orderBy ++ paging
     logger.debug("Select query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
     q
   }
@@ -57,10 +55,7 @@ class ApiSqlBuilder[R <: Product](db: DBMapping[R], query: Query[R]) extends Laz
       case Between(a, b) =>
         BoundQuery(
           s"$c BETWEEN {${c + "_from"}} AND {${c + "_to"}}",
-          Seq(
-            Binding(c + "_from", a),
-            Binding(c + "_to", b)
-          )
+          Seq(Binding(c + "_from", a), Binding(c + "_to", b))
         )
       case In(list) =>
         val indexed = list.zipWithIndex.map { l => (column + l._2, l._1)}.toMap
