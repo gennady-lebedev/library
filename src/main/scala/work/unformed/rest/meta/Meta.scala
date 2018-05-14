@@ -2,19 +2,22 @@ package work.unformed.rest.meta
 
 import work.unformed.rest.meta.Meta.Field
 
+import scala.reflect.runtime.currentMirror
 import scala.reflect.runtime.universe._
 
 class Meta[T <: Product : TypeTag] {
-  val entity: String = typeOf[T].typeSymbol.name.toString.trim
+  val typeValue: Type = typeOf[T]
+
+  val typeName: String = typeValue.typeSymbol.name.toString.trim
 
   val fields: Seq[TermSymbol] = {
-    typeOf[T].members.collect {
+    typeValue.members.collect {
       case m: TermSymbol if m.isVal => m
     }.toSeq.reverse
   }
 
   val annotations: Map[String, List[Annotation]] = {
-    typeOf[T].typeSymbol.asClass.primaryConstructor.typeSignature.paramLists.flatMap { p =>
+    typeValue.typeSymbol.asClass.primaryConstructor.typeSignature.paramLists.flatMap { p =>
       p.map { pp => (pp.name.toString.trim, pp.annotations)}
     }.toMap
   }
@@ -35,6 +38,14 @@ class Meta[T <: Product : TypeTag] {
 
   val keys: Seq[String] = fieldMap.filter(t => t._2.isKey).keys.toSeq
   val auto: Seq[String] = fieldMap.filter(t => t._2.isAuto).keys.toSeq
+
+  def construct(args: Seq[Any]): T = {
+    currentMirror
+      .reflectClass(typeTag[T].tpe.typeSymbol.asClass)
+      .reflectConstructor(
+        typeTag[T].tpe.members.filter(m => m.isMethod && m.asMethod.isConstructor).iterator.next.asMethod
+      )(args:_*).asInstanceOf[T]
+  }
 }
 
 object Meta {

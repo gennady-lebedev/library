@@ -14,7 +14,7 @@ class RootRouter extends LazyLogging with CorsSupport {
       handleExceptions(exceptionHandler){
         extractUri { uri =>
           extractMethod { method =>
-            logger.debug("{} {}", method.value, uri.toRelative.path)
+            logger.debug("{} {}{}", method.value, uri.toRelative.path, uri.queryString().map("?" + _).getOrElse(""))
             ignoreTrailingSlash {
               healthRoute ~ AppContext.Routes.itemRouter.routes
             }

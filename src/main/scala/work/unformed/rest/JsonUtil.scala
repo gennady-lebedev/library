@@ -52,7 +52,7 @@ object JsonUtil {
         case (name, field) => Some(name, field)
         case _ => None
       }
-      EntityMeta(a.entity, f).asJson
+      EntityMeta(a.typeName, f).asJson
     }
   }
 }
