@@ -1,4 +1,4 @@
-package work.unformed.library.routers
+package work.unformed.rest
 
 import akka.http.scaladsl.server.Route
 

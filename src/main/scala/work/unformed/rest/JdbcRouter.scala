@@ -1,14 +1,14 @@
-package work.unformed.library.routers
+package work.unformed.rest
 
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{PathMatcher, Route}
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.semiauto._
+import io.circe.{Decoder, Encoder}
+import work.unformed.rest.JsonUtil._
 import work.unformed.rest.meta.{Meta, QuerySupport, Result}
 import work.unformed.rest.repository.JdbcRepository
-import work.unformed.rest.JsonUtil._
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto._
 
 class JdbcRouter[T <: Product : Meta : Encoder : Decoder](route: PathMatcher[Unit], repo: JdbcRepository[T]) extends QuerySupport[T] with Router {
   implicit val resultEncoder: Encoder[Result[T]] = deriveEncoder[Result[T]]

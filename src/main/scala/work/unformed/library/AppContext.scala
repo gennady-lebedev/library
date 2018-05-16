@@ -7,7 +7,7 @@ import work.unformed.rest.repository.JdbcRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.db.JdbcSupport
-import work.unformed.library.routers.JdbcRouter
+import work.unformed.rest.JdbcRouter
 import work.unformed.rest.meta.{DBMapping, Meta}
 
 import work.unformed.rest.JsonUtil._
