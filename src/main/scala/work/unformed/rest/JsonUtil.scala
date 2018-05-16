@@ -1,18 +1,18 @@
 package work.unformed.rest
 
 import io.circe.Decoder.Result
-import io.circe.generic.extras.Configuration
+import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe._
 import io.circe.syntax._
-import io.circe.generic.extras.auto._
 import work.unformed.rest.meta._
 import java.sql.{Date, Time, Timestamp}
 
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import work.unformed.rest.meta.Meta.Field
 
 import scala.reflect.runtime.universe._
 
-object JsonUtil {
+object JsonUtil extends AutoDerivation with FailFastCirceSupport {
   implicit val configuration: Configuration = Configuration.default.withDefaults.withKebabCaseConstructorNames.withKebabCaseMemberNames
   implicit val printer: Printer = Printer.noSpaces.copy(dropNullValues = true)
 

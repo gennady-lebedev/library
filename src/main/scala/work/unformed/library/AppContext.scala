@@ -11,8 +11,6 @@ import work.unformed.rest.JdbcRouter
 import work.unformed.rest.meta.{DBMapping, Meta}
 
 import work.unformed.rest.JsonUtil._
-import io.circe.generic.extras.auto._
-
 import scala.concurrent.ExecutionContext
 
 object AppContext extends LazyLogging with JdbcSupport {
