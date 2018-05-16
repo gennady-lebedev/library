@@ -4,10 +4,11 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.typesafe.scalalogging.LazyLogging
+import work.unformed.library.routers.Router
 import work.unformed.rest.{CorsSupport, JsonUtil}
 import work.unformed.rest.repository.RepositoryError
 
-class RootRouter extends LazyLogging with CorsSupport {
+class RootRouter(routers: Router*) extends LazyLogging with CorsSupport {
 
   val routes: Route =
     cors {
@@ -16,7 +17,7 @@ class RootRouter extends LazyLogging with CorsSupport {
           extractMethod { method =>
             logger.debug("{} {}{}", method.value, uri.toRelative.path, uri.queryString().map("?" + _).getOrElse(""))
             ignoreTrailingSlash {
-              healthRoute ~ AppContext.Routes.itemRouter.routes
+              healthRoute ~ routers.map(_.routes).reduce(_ ~ _)
             }
           }
         }

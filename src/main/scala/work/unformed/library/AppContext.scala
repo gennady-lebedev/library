@@ -7,6 +7,7 @@ import work.unformed.rest.repository.JdbcRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.db.JdbcSupport
+import work.unformed.library.routers.JdbcRouter
 import work.unformed.rest.meta.{DBMapping, Meta}
 
 import scala.concurrent.ExecutionContext
@@ -20,9 +21,10 @@ object AppContext extends LazyLogging with JdbcSupport {
 
   import MetaContext._
   import DBContext._
-  val itemsRepository = new JdbcRepository[Item]
 
-  val router = new RootRouter
+  val router = new RootRouter(
+    new JdbcRouter("items", new JdbcRepository[Item])
+  )
 
   object MetaContext {
     implicit val itemMeta: Meta[Item] = new Meta[Item]
@@ -30,9 +32,5 @@ object AppContext extends LazyLogging with JdbcSupport {
 
   object DBContext {
     implicit val itemDb: DBMapping[Item] = new DBMapping[Item](Some("items"))
-  }
-
-  object Routes {
-    val itemRouter = new ItemRouter()
   }
 }

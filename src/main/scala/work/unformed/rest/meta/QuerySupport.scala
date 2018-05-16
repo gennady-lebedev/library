@@ -8,9 +8,9 @@ import akka.http.scaladsl.unmarshalling.{FromRequestUnmarshaller, Unmarshaller}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.rest.meta.Meta.Field
 
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.typeOf
 
-abstract class QuerySupport[T <: Product : TypeTag](implicit meta: Meta[T]) extends LazyLogging {
+abstract class QuerySupport[T <: Product](implicit meta: Meta[T]) extends LazyLogging {
 
   implicit def queryUnmarshaller: FromRequestUnmarshaller[Query[T]] = Unmarshaller.strict { ctx =>
     val params = ctx.uri.query().toMap
@@ -46,11 +46,12 @@ abstract class QuerySupport[T <: Product : TypeTag](implicit meta: Meta[T]) exte
           else if (t =:= typeOf[Int]) params(name).map(_.toInt)
           else if (t =:= typeOf[Long]) params(name).map(_.toLong)
           else if (t =:= typeOf[Double]) params(name).map(_.toDouble)
+          else if (t =:= typeOf[Boolean]) params(name).map(_.toBoolean)
           else if (t =:= typeOf[BigDecimal]) params(name).map(BigDecimal.apply)
           else if (t =:= typeOf[Date]) params(name).map(Date.valueOf)
           else if (t =:= typeOf[Time]) params(name).map(Time.valueOf)
           else if (t =:= typeOf[Timestamp]) params(name).map(Timestamp.valueOf)
-          else throw new RuntimeException("Unsupported type " + typeOf[T])
+          else throw new RuntimeException(s"Unsupported param $name of type $t")
         Some(Filter(name, In(values)))
       case _ => None
     }.toSeq
