@@ -3,29 +3,21 @@ package work.unformed.library.routers
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{PathMatcher, Route}
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-import io.circe.Decoder.Result
-import io.circe.{Decoder, Encoder, HCursor, Json}
-import io.circe.generic.extras.auto._
-import io.circe.syntax._
-import work.unformed.rest.JsonUtil._
-import work.unformed.rest.meta.{Meta, QuerySupport}
+import work.unformed.rest.meta.{Meta, QuerySupport, Result}
 import work.unformed.rest.repository.JdbcRepository
+import work.unformed.rest.JsonUtil._
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.{Decoder, Encoder}
+import io.circe.generic.semiauto._
 
-class JdbcRouter[T <: Product](route: PathMatcher[Unit], repo: JdbcRepository[T])(implicit meta: Meta[T]) extends QuerySupport[T] with Router {
+class JdbcRouter[T <: Product : Meta : Encoder : Decoder](route: PathMatcher[Unit], repo: JdbcRepository[T]) extends QuerySupport[T] with Router {
+  implicit val resultEncoder: Encoder[Result[T]] = deriveEncoder[Result[T]]
+
   lazy val routes: Route = metaRoute ~ collectionRoutes ~ itemRoutes
-
-  implicit val en: Encoder[T] = new Encoder[T] {
-    override def apply(a: T): Json = a.asJson
-  }
-
-  implicit val de: Decoder[T] = new Decoder[T] {
-    override def apply(c: HCursor): Result[T] = c.as[T]
-  }
 
   private val metaRoute: Route = path(route / "meta") {
     get {
-      complete(meta)
+      complete(implicitly[Meta[T]])
     }
   }
 
