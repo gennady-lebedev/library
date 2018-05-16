@@ -12,7 +12,7 @@ import work.unformed.rest.meta.Meta.Field
 
 import scala.reflect.runtime.universe._
 
-object JsonUtil extends AutoDerivation with FailFastCirceSupport {
+trait CirceSupport extends AutoDerivation with FailFastCirceSupport {
   implicit val configuration: Configuration = Configuration.default.withDefaults.withKebabCaseConstructorNames.withKebabCaseMemberNames
   implicit val printer: Printer = Printer.noSpaces.copy(dropNullValues = true)
 

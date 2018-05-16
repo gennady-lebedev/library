@@ -4,11 +4,11 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{PathMatcher, Route}
 import io.circe.{Decoder, Encoder}
-import work.unformed.rest.JsonUtil._
 import work.unformed.rest.meta.{Meta, QuerySupport}
 import work.unformed.rest.repository.JdbcRepository
 
-class JdbcRouter[T <: Product : Meta : Encoder : Decoder](route: PathMatcher[Unit], repo: JdbcRepository[T]) extends QuerySupport[T] with Router {
+class JdbcRouter[T <: Product : Meta : Encoder : Decoder](route: PathMatcher[Unit], repo: JdbcRepository[T])
+  extends QuerySupport[T] with CirceSupport with Router {
 
   lazy val routes: Route = metaRoute ~ collectionRoutes ~ itemRoutes
 

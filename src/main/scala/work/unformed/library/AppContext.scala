@@ -7,13 +7,12 @@ import work.unformed.rest.repository.JdbcRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.db.JdbcSupport
-import work.unformed.rest.JdbcRouter
+import work.unformed.rest.{CirceSupport, JdbcRouter}
 import work.unformed.rest.meta.{DBMapping, Meta}
 
-import work.unformed.rest.JsonUtil._
 import scala.concurrent.ExecutionContext
 
-object AppContext extends LazyLogging with JdbcSupport {
+object AppContext extends LazyLogging with JdbcSupport with CirceSupport {
   val config: Config = ConfigFactory.defaultApplication()
   implicit val actorSystem: ActorSystem = ActorSystem()
   implicit val executor: ExecutionContext = actorSystem.dispatcher
