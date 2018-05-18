@@ -23,7 +23,7 @@ class DBMapping[T <: Product]
 
   val fieldsToColumns: Map[String, String] = meta.fieldNames.zip(columns).toMap
 
-  val keyColumn: String = fieldsToColumns(meta.keys.head)
+  val keyColumns: Seq[String] = meta.keys.map(fieldsToColumns)
 
   def camelToSnake(s: String): String = {
     val draft = "[A-Z]".r.replaceAllIn(s, { m => "_" + m.group(0).toLowerCase() })

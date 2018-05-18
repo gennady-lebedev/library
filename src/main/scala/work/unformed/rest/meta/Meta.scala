@@ -39,6 +39,8 @@ class Meta[T <: Product : TypeTag] {
   val keys: Seq[String] = fieldMap.filter(t => t._2.isKey).keys.toSeq
   val auto: Seq[String] = fieldMap.filter(t => t._2.isAuto).keys.toSeq
 
+  def keyValues(instance: T): Seq[Any] = fieldNames.zipWithIndex.filter(keys.contains).map(k => instance.productElement(k._2))
+
   def construct(args: Seq[Any]): T = {
     currentMirror
       .reflectClass(typeTag[T].tpe.typeSymbol.asClass)

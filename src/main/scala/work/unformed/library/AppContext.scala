@@ -24,8 +24,8 @@ object AppContext extends LazyLogging with JdbcSupport with CirceSupport {
 
   val router = new RootRouter(
     //new JdbcRouter("items", new JdbcRepository[Item]),
-    new JdbcRouter("authors", new JdbcRepository[Author]),
-    new JdbcRouter("publishers", new JdbcRepository[Publisher])
+    new JdbcRouter("authors", JdbcRepository[Author]),
+    new JdbcRouter("publishers", JdbcRepository[Publisher])
   )
 
   object MetaContext {
