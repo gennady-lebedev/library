@@ -15,6 +15,11 @@ case class BoundQuery(sql: String, bindings: Binding*) {
     this.bindings ++ that.bindings :_*
   )
 
+  def where(bindings: Binding*): BoundQuery =
+    this ++ BoundQuery("WHERE") ++ bindings
+      .map(b => BoundQuery(s"${b.name} = {${b.name}}", b.name, b.value))
+      .reduce(_ and _)
+
   private def bindByName: SQL[Nothing, NoExtractor] = SQL(sql).bindByName(bindings.map(b => (Symbol(b.name), b.value)) :_*)
 
   def map[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): Seq[T] = bindByName.map(f).list().apply()
@@ -25,6 +30,8 @@ case class BoundQuery(sql: String, bindings: Binding*) {
   def execute(implicit session: DBSession = AutoSession): Unit = bindByName.execute().apply()
 
   override def toString: String = s"$sql with ${bindings.map(b => b.name + ":" + b.value).mkString(", ")}"
+
+  def toBatch(bindings: Seq[Seq[Binding]]): BatchQuery = BatchQuery(sql, bindings)
 }
 
 object BoundQuery {

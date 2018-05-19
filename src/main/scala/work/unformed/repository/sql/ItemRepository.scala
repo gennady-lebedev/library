@@ -1,7 +1,7 @@
 package work.unformed.repository.sql
 
 import work.unformed.meta._
-import work.unformed.repository.{InvalidUpdateKey, NothingToUpdate}
+import work.unformed.repository.{InvalidUpdateKey, NothingToUpdate, RepositoryItemNotFound}
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
 
@@ -57,6 +57,13 @@ class ItemRepository[T <: Product : DBMapping] extends LazyLogging {
       ) ++ whereKeysSql(newValue)
     logger.debug("Update query generated: {}", q)
     q.execute
+  }
+
+  def updateUnsafe(item: T)(implicit session: DBSession = AutoSession): Unit = {
+    select(item) match {
+      case Some(v) => update(v, item)
+      case None => throw new RepositoryItemNotFound(db.meta.keyValues(item))
+    }
   }
 
   def delete(item: T)(implicit session: DBSession = AutoSession): Unit = {

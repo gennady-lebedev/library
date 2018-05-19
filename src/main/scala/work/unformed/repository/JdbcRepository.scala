@@ -26,7 +26,6 @@ class JdbcRepository[T <: Product : DBMapping] extends RwRepository[T, Long] wit
   override def create(draft: T)(implicit session: DBSession = AutoSession): T =
     get(ItemRepository[T].insertAuto(draft))
 
-
   override def update(entity: T)(implicit session: DBSession = AutoSession): T = {
     ItemRepository[T].select(entity) match {
       case Some(old) if old == entity => throw new NothingToUpdate
