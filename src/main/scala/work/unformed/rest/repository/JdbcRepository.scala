@@ -18,7 +18,7 @@ class JdbcRepository[T <: Product : DBMapping] extends RwRepository[T, Long] wit
     ApiRepository[T].count(query)
 
   override def findById(id: Long)(implicit session: DBSession = AutoSession): Option[T] =
-    ItemRepository[T].select(id)
+    ItemRepository[T].selectById(id)
 
   override def get(id: Long)(implicit session: DBSession = AutoSession): T = findById(id) match {
     case Some(v) => v
@@ -26,7 +26,7 @@ class JdbcRepository[T <: Product : DBMapping] extends RwRepository[T, Long] wit
   }
 
   override def create(draft: T)(implicit session: DBSession = AutoSession): T =
-    get(ItemRepository[T].insert(draft))
+    get(ItemRepository[T].insertAuto(draft))
 
 
   override def update(entity: T)(implicit session: DBSession = AutoSession): T = {

@@ -3,28 +3,29 @@ package work.unformed.rest.repository.sql
 import work.unformed.rest.meta._
 import work.unformed.rest.repository.{InvalidUpdateKey, NothingToUpdate}
 import com.typesafe.scalalogging.LazyLogging
+import scalikejdbc.{AutoSession, DBSession}
 
 object ItemRepository {
-  def apply[T <: Product : DBMapping]: ItemRepository[T] = new ItemRepository[T](implicitly[DBMapping[T]])
+  def apply[T <: Product : DBMapping]: ItemRepository[T] = new ItemRepository[T]
 }
 
-class ItemRepository[T <: Product](db: DBMapping[T]) extends LazyLogging {
+class ItemRepository[T <: Product : DBMapping] extends LazyLogging {
+  private val db = implicitly[DBMapping[T]]
 
-  def select(id: Long): Option[T] = {
+  def selectById(id: Long)(implicit session: DBSession = AutoSession): Option[T] = {
     val key = db.columns.zipWithIndex.filter(c => db.keyColumns.contains(c._1)).head
     val q = BoundQuery(s"SELECT * FROM ${db.table} WHERE ${key._1}={${key._1}}", key._1, id)
-    logger.debug("Select query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
+    logger.debug("Select by ID generated: {}", q)
     q.single(db.parse)
   }
 
-  def select(item: T): Option[T] = {
-    val key = db.columns.zipWithIndex.filter(c => db.keyColumns.contains(c._1)).head
-    val q = BoundQuery(s"SELECT * FROM ${db.table} WHERE ${key._1}={${key._1}}", key._1, item.productElement(key._2))
-    logger.debug("Select query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
+  def select(item: T)(implicit session: DBSession = AutoSession): Option[T] = {
+    val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ whereKeysSql(item)
+    logger.debug("Select from Entity generated: {}", q)
     q.single(db.parse)
   }
 
-  def insert(value: T): Long = {
+  private def insertBindings(value: T): BoundQuery = {
     val bindings = db.columns
       .zipWithIndex
       .filterNot(a => db.meta.auto.contains(a._1))
@@ -34,11 +35,19 @@ class ItemRepository[T <: Product](db: DBMapping[T]) extends LazyLogging {
       bindings.map(_.name).mkString("(", ", ", ")") + " VALUES " + bindings.map("{" + _.name + "}").mkString("(", ", ", ")"),
       bindings :_*
     )
-    logger.debug("Insert query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
-    q.insert(value)
+    logger.debug("Insert query generated: {}", q)
+    q
   }
 
-  def update(oldValue: T, newValue: T): Unit = {
+  def insertAuto(value: T)(implicit session: DBSession = AutoSession): Long = {
+    insertBindings(value).insertAuto(value)
+  }
+
+  def insert(value: T)(implicit session: DBSession = AutoSession): Unit = {
+    insertBindings(value).insert(value)
+  }
+
+  def update(oldValue: T, newValue: T)(implicit session: DBSession = AutoSession): Unit = {
     if (db.meta.keyValues(oldValue) != db.meta.keyValues(newValue))
       throw new InvalidUpdateKey(oldValue, newValue)
 
@@ -53,13 +62,13 @@ class ItemRepository[T <: Product](db: DBMapping[T]) extends LazyLogging {
         "SET " + changed.map(c => c._1 + "={" + c._1 + "}").mkString(","),
         changed.map(c => Binding(c._1, newValue.productElement(c._2))) :_*
       ) ++ whereKeysSql(newValue)
-    logger.debug("Update query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
+    logger.debug("Update query generated: {}", q)
     q.execute
   }
 
-  def delete(item: T): Unit = {
+  def delete(item: T)(implicit session: DBSession = AutoSession): Unit = {
     val q = BoundQuery(s"DELETE FROM ${db.table}") ++ whereKeysSql(item)
-    logger.debug("Delete query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
+    logger.debug("Delete query generated: {}", q)
     q.execute
   }
 

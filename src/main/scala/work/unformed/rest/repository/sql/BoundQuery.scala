@@ -15,19 +15,16 @@ case class BoundQuery(sql: String, bindings: Binding*) {
     this.bindings ++ that.bindings :_*
   )
 
-  private def toScalike: SQL[Nothing, NoExtractor] = {
-    SQL(sql).bindByName(bindings.map(b => (Symbol(b.name), b.value)) :_*)
-  }
+  private def bindByName: SQL[Nothing, NoExtractor] = SQL(sql).bindByName(bindings.map(b => (Symbol(b.name), b.value)) :_*)
 
-  def map[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): Seq[T] = toScalike.map(f).list().apply()
-
-  def single[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): Option[T] = toScalike.map(f).single().apply()
-
+  def map[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): Seq[T] = bindByName.map(f).list().apply()
+  def single[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): Option[T] = bindByName.map(f).single().apply()
   def get[T](f: WrappedResultSet => T)(implicit session: DBSession = AutoSession): T = single(f).get
+  def insert[T](draft: T)(implicit session: DBSession = AutoSession): Unit = bindByName.update().apply()
+  def insertAuto[T](draft: T)(implicit session: DBSession = AutoSession): Long = bindByName.updateAndReturnGeneratedKey(1).apply()
+  def execute(implicit session: DBSession = AutoSession): Unit = bindByName.execute().apply()
 
-  def insert[T](draft: T)(implicit session: DBSession = AutoSession): Long = toScalike.updateAndReturnGeneratedKey(1).apply()
-
-  def execute(implicit session: DBSession = AutoSession): Unit = toScalike.execute().apply()
+  override def toString: String = s"$sql with ${bindings.map(b => b.name + ":" + b.value).mkString(", ")}"
 }
 
 object BoundQuery {

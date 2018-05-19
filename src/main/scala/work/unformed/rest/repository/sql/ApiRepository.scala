@@ -2,29 +2,38 @@ package work.unformed.rest.repository.sql
 
 import work.unformed.rest.meta._
 import com.typesafe.scalalogging.LazyLogging
+import scalikejdbc.{AutoSession, DBSession}
 
 object ApiRepository {
-  def apply[T <: Product : DBMapping] = new ApiRepository[T](implicitly[DBMapping[T]])
+  def apply[T <: Product : DBMapping] = new ApiRepository[T]
 }
 
-class ApiRepository[T <: Product](db: DBMapping[T]) extends LazyLogging {
+class ApiRepository[T <: Product : DBMapping] extends LazyLogging {
+  private val db = implicitly[DBMapping[T]]
 
-  def select(query: Query[T]): Seq[T] = {
+  def select(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
     val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort) ++ buildPage(query.page)
-    logger.debug("Select query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
+    logger.debug("Select query generated: {}", q)
     q.map(rs => db.parse(rs))
   }
 
-  def count(query: Query[T]): Long = {
+  def selectAll(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
+    val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort)
+    logger.debug("Select without paging generated: {}", q)
+    q.map(rs => db.parse(rs))
+  }
+
+  def count(query: Query[T])(implicit session: DBSession = AutoSession): Long = {
     val q = BoundQuery(s"SELECT count(1) total FROM ${db.table}") ++ buildWhere(query.filter)
-    logger.debug("Count query generated: {} with bindings {}", q.sql, q.bindings.map(b => b.name + ":" + b.value).mkString(", "))
+    logger.debug("Count query generated: {}", q)
     q.get(rs => rs.long("total"))
   }
 
   private def buildWhere(filters: Seq[Filter]): BoundQuery = {
-    if(filters.nonEmpty) {
+    if(filters.nonEmpty)
       BoundQuery("WHERE ") ++ filters.map(toSql).reduce(_ and _)
-    } else BoundQuery.empty
+    else
+      BoundQuery.empty
   }
 
   private def toSql(f: Filter): BoundQuery = {
