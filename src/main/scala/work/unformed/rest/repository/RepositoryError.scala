@@ -13,8 +13,8 @@ abstract class RepositoryError
 
 case class ErrorResponse(code: Int, message: String)
 
-class RepositoryItemNotFound(id: Any)
-  extends RepositoryError(0, s"Element #$id not found", StatusCodes.NotFound)
+class RepositoryItemNotFound(id: Any*)
+  extends RepositoryError(0, s"Element #${id.mkString(",")} not found", StatusCodes.NotFound)
 
 class RepositoryItemNotCreated(value: Any)
   extends RepositoryError(1, s"Element $value failed on insert", StatusCodes.BadRequest)

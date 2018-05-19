@@ -1,7 +1,7 @@
 package work.unformed.rest.repository
 
 import work.unformed.rest.meta.{DBMapping, Query, Result}
-import work.unformed.rest.repository.sql.{ApiRepository, ItemRepository}
+import work.unformed.rest.repository.sql.{ApiRepository, IdRepository, ItemRepository}
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
 
@@ -18,12 +18,10 @@ class JdbcRepository[T <: Product : DBMapping] extends RwRepository[T, Long] wit
     ApiRepository[T].count(query)
 
   override def findById(id: Long)(implicit session: DBSession = AutoSession): Option[T] =
-    ItemRepository[T].selectById(id)
+    IdRepository[T].findById(id)
 
-  override def get(id: Long)(implicit session: DBSession = AutoSession): T = findById(id) match {
-    case Some(v) => v
-    case None => throw new RepositoryItemNotFound(id)
-  }
+  override def get(id: Long)(implicit session: DBSession = AutoSession): T =
+    IdRepository[T].getById(id)
 
   override def create(draft: T)(implicit session: DBSession = AutoSession): T =
     get(ItemRepository[T].insertAuto(draft))

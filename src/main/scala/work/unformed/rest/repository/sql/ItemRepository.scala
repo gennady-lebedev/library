@@ -12,13 +12,6 @@ object ItemRepository {
 class ItemRepository[T <: Product : DBMapping] extends LazyLogging {
   private val db = implicitly[DBMapping[T]]
 
-  def selectById(id: Long)(implicit session: DBSession = AutoSession): Option[T] = {
-    val key = db.columns.zipWithIndex.filter(c => db.keyColumns.contains(c._1)).head
-    val q = BoundQuery(s"SELECT * FROM ${db.table} WHERE ${key._1}={${key._1}}", key._1, id)
-    logger.debug("Select by ID generated: {}", q)
-    q.single(db.parse)
-  }
-
   def select(item: T)(implicit session: DBSession = AutoSession): Option[T] = {
     val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ whereKeysSql(item)
     logger.debug("Select from Entity generated: {}", q)
