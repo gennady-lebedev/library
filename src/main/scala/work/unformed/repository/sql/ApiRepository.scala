@@ -31,7 +31,7 @@ class ApiRepository[T <: Product : DBMapping] extends LazyLogging {
 
   private def buildWhere(filters: Seq[Filter]): BoundQuery = {
     if(filters.nonEmpty)
-      BoundQuery("WHERE ") ++ filters.map(toSql).reduce(_ and _)
+      BoundQuery("WHERE") ++ filters.map(toSql).reduce(_ and _)
     else
       BoundQuery.empty
   }
