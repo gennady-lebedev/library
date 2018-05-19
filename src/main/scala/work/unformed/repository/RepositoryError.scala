@@ -25,6 +25,9 @@ class InvalidUpdateKey(oldValue: Any, newValue: Any)
 class NothingToUpdate
   extends RepositoryError(3, s"Nothing to update", StatusCodes.Conflict)
 
+class UpdateFailed(entity: Any)
+  extends RepositoryError(3, s"Failed to read updated $entity")
+
 class ConflictOnDelete
   extends RepositoryError(4, s"Entity was changed", StatusCodes.Conflict)
 

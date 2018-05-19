@@ -27,12 +27,10 @@ class JdbcRepository[T <: Product : DBMapping] extends RwRepository[T, Long] wit
     get(ItemRepository[T].insertAuto(draft))
 
   override def update(entity: T)(implicit session: DBSession = AutoSession): T = {
+    ItemRepository[T].update(entity)
     ItemRepository[T].select(entity) match {
-      case Some(old) if old == entity => throw new NothingToUpdate
-      case Some(old) =>
-        ItemRepository[T].update(old, entity)
-        ItemRepository[T].select(entity).get
-      case None => throw new RepositoryItemNotFound(entity)
+      case Some(updated) => updated
+      case None => throw new UpdateFailed(entity)
     }
   }
 

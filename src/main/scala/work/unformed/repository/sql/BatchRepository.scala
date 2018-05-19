@@ -51,7 +51,7 @@ class BatchRepository[T <: Product : DBMapping] extends LazyLogging {
     db.meta.reconcile(newValues, oldValues)
         .doOnCreated(add)
         .doOnRemoved(_.foreach(ItemRepository[T].delete))
-        .doOnUpdated(_.foreach(ItemRepository[T].updateUnsafe))
+        .doOnUpdated(_.foreach(ItemRepository[T].update))
     itemSet(bindings:_*)
   }
 

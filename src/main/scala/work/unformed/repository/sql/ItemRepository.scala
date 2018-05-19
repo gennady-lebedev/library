@@ -40,29 +40,23 @@ class ItemRepository[T <: Product : DBMapping] extends LazyLogging {
     insertBindings(value).insert(value)
   }
 
-  def update(oldValue: T, newValue: T)(implicit session: DBSession = AutoSession): Unit = {
-    if (db.meta.keyValues(oldValue) != db.meta.keyValues(newValue))
-      throw new InvalidUpdateKey(oldValue, newValue)
+  def update(newValue: T)(implicit session: DBSession = AutoSession): Unit = {
+    select(newValue) match {
+      case Some(oldValue) if oldValue != newValue =>
+        val changed = db.columns
+          .zipWithIndex
+          .filterNot(c => db.keyColumns.contains(c._1))
+          .filterNot(c => oldValue.productElement(c._2) == newValue.productElement(c._2))
 
-    val changed = db.columns
-      .zipWithIndex
-      .filterNot(c => db.keyColumns.contains(c._1))
-      .filterNot(c => oldValue.productElement(c._2) == newValue.productElement(c._2))
+        val q = BoundQuery(s"UPDATE ${db.table}") ++ BoundQuery(
+          "SET " + changed.map(c => c._1 + "={" + c._1 + "}").mkString(","),
+          changed.map(c => Binding(c._1, newValue.productElement(c._2))) :_*
+        ) ++ whereKeysSql(newValue)
+        logger.debug("Update query generated: {}", q)
+        q.execute
 
-    if (changed.isEmpty) throw new NothingToUpdate()
-
-    val q = BoundQuery(s"UPDATE ${db.table}") ++ BoundQuery(
-        "SET " + changed.map(c => c._1 + "={" + c._1 + "}").mkString(","),
-        changed.map(c => Binding(c._1, newValue.productElement(c._2))) :_*
-      ) ++ whereKeysSql(newValue)
-    logger.debug("Update query generated: {}", q)
-    q.execute
-  }
-
-  def updateUnsafe(item: T)(implicit session: DBSession = AutoSession): Unit = {
-    select(item) match {
-      case Some(v) => update(v, item)
-      case None => throw new RepositoryItemNotFound(db.meta.keyValues(item))
+      case Some(notChanged) => throw new NothingToUpdate()
+      case None => throw new RepositoryItemNotFound(db.meta.keyValues(newValue))
     }
   }
 
@@ -74,11 +68,11 @@ class ItemRepository[T <: Product : DBMapping] extends LazyLogging {
 
   private def whereKeysSql(item: T): BoundQuery = {
     if(db.keyColumns.nonEmpty)
-      BoundQuery("WHERE") ++
+      BoundQuery.empty.where(
         db.keyColumns
           .zip(db.meta.keyValues(item))
-          .map { case(k, v) => BoundQuery(s"$k = {$k}", k, v)}
-          .reduce(_ and _)
+          .map { case(k, v) => Binding(k, v)} :_*
+      )
     else
       throw new RuntimeException(s"Can't build where with keys because keys are empty in ${db.meta.typeName}")
   }
