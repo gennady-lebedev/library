@@ -1,4 +1,4 @@
-package work.unformed.rest.repository.sql
+package work.unformed.repository.sql
 
 import scalikejdbc.{AutoSession, DBSession, NoExtractor, SQL, SQLBatch, WrappedResultSet}
 

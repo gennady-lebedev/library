@@ -1,6 +1,6 @@
-package work.unformed.rest.repository.sql
+package work.unformed.repository.sql
 
-import work.unformed.rest.meta._
+import work.unformed.meta._
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
 

@@ -1,4 +1,4 @@
-package work.unformed.rest.meta
+package work.unformed.meta
 
 case class Query[P <: Product](page: Page = Page(), filter: Seq[Filter] = Seq.empty, sort: Seq[Sort] = Seq.empty)
 

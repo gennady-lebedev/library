@@ -6,8 +6,8 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{PathMatcher, Route}
 
 import io.circe.{Decoder, Encoder}
-import work.unformed.rest.meta.{Meta, Query, QuerySupport, Result}
-import work.unformed.rest.repository.JdbcRepository
+import work.unformed.meta.{Meta, Query, QuerySupport, Result}
+import work.unformed.repository.JdbcRepository
 
 class JdbcRouter[T <: Product : Meta : Encoder : Decoder](route: PathMatcher[Unit], repo: JdbcRepository[T])
   extends QuerySupport with CirceSupport with CsvSupport with ExcelSupport with Router {

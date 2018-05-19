@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.rest.{CirceSupport, CorsSupport, Router}
-import work.unformed.rest.repository.RepositoryError
+import work.unformed.repository.RepositoryError
 
 class RootRouter(routers: Router*) extends LazyLogging with CorsSupport with CirceSupport {
 

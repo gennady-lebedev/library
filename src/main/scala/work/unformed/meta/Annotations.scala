@@ -1,4 +1,4 @@
-package work.unformed.rest.meta
+package work.unformed.meta
 
 import scala.annotation.StaticAnnotation
 

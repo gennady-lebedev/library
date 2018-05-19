@@ -1,7 +1,7 @@
-package work.unformed.rest.repository
+package work.unformed.repository
 
-import work.unformed.rest.meta.{DBMapping, Query, Result}
-import work.unformed.rest.repository.sql.{ApiRepository, IdRepository, ItemRepository}
+import work.unformed.meta.{DBMapping, Query, Result}
+import work.unformed.repository.sql.{ApiRepository, IdRepository, ItemRepository}
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
 

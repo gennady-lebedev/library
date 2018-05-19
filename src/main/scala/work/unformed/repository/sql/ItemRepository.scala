@@ -1,7 +1,7 @@
-package work.unformed.rest.repository.sql
+package work.unformed.repository.sql
 
-import work.unformed.rest.meta._
-import work.unformed.rest.repository.{InvalidUpdateKey, NothingToUpdate}
+import work.unformed.meta._
+import work.unformed.repository.{InvalidUpdateKey, NothingToUpdate}
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
 

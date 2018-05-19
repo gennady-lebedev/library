@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.headers.`Content-Disposition`
 import akka.util.ByteString
 import com.norbitltd.spoiwo.model.{Row, Sheet}
 import com.norbitltd.spoiwo.natures.xlsx.Model2XlsxConversions._
-import work.unformed.rest.meta.{Meta, Result}
+import work.unformed.meta.{Meta, Result}
 
 import scala.collection.immutable
 

@@ -4,11 +4,11 @@ import io.circe.Decoder.Result
 import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe._
 import io.circe.syntax._
-import work.unformed.rest.meta._
+import work.unformed.meta._
 import java.sql.{Date, Time, Timestamp}
 
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
-import work.unformed.rest.meta.Meta.Field
+import work.unformed.meta.Meta.Field
 
 import scala.reflect.runtime.universe._
 

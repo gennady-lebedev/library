@@ -3,12 +3,12 @@ package work.unformed.library
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import work.unformed.library.model.{Author, Item, Publisher}
-import work.unformed.rest.repository.JdbcRepository
+import work.unformed.repository.JdbcRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.db.JdbcSupport
 import work.unformed.rest.{CirceSupport, JdbcRouter}
-import work.unformed.rest.meta.{DBMapping, Meta}
+import work.unformed.meta.{DBMapping, Meta}
 
 import scala.concurrent.ExecutionContext
 

@@ -1,7 +1,7 @@
-package work.unformed.rest.repository
+package work.unformed.repository
 
-import scalikejdbc.{AutoSession, DBSession}
-import work.unformed.rest.meta.{Query, Result}
+import scalikejdbc.DBSession
+import work.unformed.meta.{Query, Result}
 
 trait Repository[P <: Product, K <: AnyVal]
 

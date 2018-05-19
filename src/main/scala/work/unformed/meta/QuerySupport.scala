@@ -1,4 +1,4 @@
-package work.unformed.rest.meta
+package work.unformed.meta
 
 import java.sql.{Date, Time, Timestamp}
 
@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Directive1
 import akka.http.scaladsl.server.Directives.{as, entity}
 import akka.http.scaladsl.unmarshalling.{FromRequestUnmarshaller, Unmarshaller}
 import com.typesafe.scalalogging.LazyLogging
-import work.unformed.rest.meta.Meta.Field
+import work.unformed.meta.Meta.Field
 
 import scala.reflect.runtime.universe.typeOf
 

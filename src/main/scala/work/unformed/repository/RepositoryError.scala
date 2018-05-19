@@ -1,4 +1,4 @@
-package work.unformed.rest.repository
+package work.unformed.repository
 
 import akka.http.scaladsl.model.{StatusCode, StatusCodes}
 

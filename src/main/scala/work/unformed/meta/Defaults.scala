@@ -1,4 +1,4 @@
-package work.unformed.rest.meta
+package work.unformed.meta
 
 import java.sql.{Date, Time, Timestamp}
 import java.time.{LocalDate, LocalDateTime, LocalTime}

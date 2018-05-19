@@ -2,7 +2,7 @@ package work.unformed.library.model
 
 import java.sql.{Date, Timestamp}
 
-import work.unformed.rest.meta.{Auto, Defaults, Key}
+import work.unformed.meta.{Auto, Defaults, Key}
 
 case class Author (
   @Key @Auto id: Long,

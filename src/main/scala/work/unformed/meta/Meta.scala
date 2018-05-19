@@ -1,6 +1,6 @@
-package work.unformed.rest.meta
+package work.unformed.meta
 
-import work.unformed.rest.meta.Meta.Field
+import work.unformed.meta.Meta.Field
 
 import scala.reflect.runtime.currentMirror
 import scala.reflect.runtime.universe._

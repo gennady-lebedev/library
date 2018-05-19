@@ -1,9 +1,9 @@
-package work.unformed.rest.repository.sql
+package work.unformed.repository.sql
 
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
-import work.unformed.rest.meta.DBMapping
-import work.unformed.rest.repository.RepositoryItemNotFound
+import work.unformed.meta.DBMapping
+import work.unformed.repository.RepositoryItemNotFound
 
 object IdRepository {
   def apply[T <: Product : DBMapping]: IdRepository[T] = new IdRepository[T]

@@ -1,9 +1,9 @@
-package work.unformed.rest.meta
+package work.unformed.meta
 
 import java.sql.{Date, Time, Timestamp}
 
 import scalikejdbc.WrappedResultSet
-import work.unformed.rest.meta.Meta.Field
+import work.unformed.meta.Meta.Field
 
 import scala.reflect.runtime.universe.typeOf
 
