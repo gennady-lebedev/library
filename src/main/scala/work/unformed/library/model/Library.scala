@@ -57,6 +57,7 @@ case object Admin extends UserRole
 
 case class User (name: String, role: UserRole)
 case class UserSecurity(name: String, pass: String, salt: Array[Byte], role: UserRole)
+object StubUser extends User("stub", Reader)
 
 sealed trait ItemStatus {
   def allowed(that: ItemStatus): Boolean = (this, that) match {
