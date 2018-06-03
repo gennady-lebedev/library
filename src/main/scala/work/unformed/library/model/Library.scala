@@ -5,7 +5,7 @@ import java.sql.{Date, Timestamp}
 import work.unformed.meta.{Auto, Defaults, Key}
 
 case class Author (
-  @Key @Auto id: Long,
+  @Key @Auto id: Long = Defaults.long,
   name: String
 )
 
@@ -31,7 +31,7 @@ case class BookUI (
 )
 
 case class BookDB (
-  @Key @Auto id: Long,
+  @Key @Auto id: Long = Defaults.long,
   title: String,
   isbn: String,
   publisherId: Long,

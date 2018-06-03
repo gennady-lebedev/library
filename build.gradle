@@ -26,7 +26,7 @@ dependencies {
     compile 'de.heikoseeberger:akka-http-circe_2.12:1.19.0'
 
     compile 'org.scalikejdbc:scalikejdbc_2.12:3.0.1'
-    compile 'mysql:mysql-connector-java:5.1.45'
+    compile 'mysql:mysql-connector-java:5.1.46'
     compile 'org.apache.kafka:kafka-clients:1.1.0'
 
     compile 'com.typesafe.scala-logging:scala-logging_2.12:3.7.2'
