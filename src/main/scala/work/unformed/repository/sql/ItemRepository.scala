@@ -1,16 +1,15 @@
 package work.unformed.repository.sql
 
 import work.unformed.meta._
-import work.unformed.repository.{InvalidUpdateKey, NothingToUpdate, RepositoryItemNotFound}
+import work.unformed.repository.{InvalidUpdateKey, NothingToUpdate, Repository, RepositoryItemNotFound}
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
 
 object ItemRepository {
-  def apply[T <: Product : DBMapping]: ItemRepository[T] = new ItemRepository[T]
+  def apply[T <: Product : DBMapping]: ItemRepository[T] = new ItemRepository[T] { override val db: DBMapping[T] = implicitly[DBMapping[T]] }
 }
 
-class ItemRepository[T <: Product : DBMapping] extends LazyLogging {
-  private val db = implicitly[DBMapping[T]]
+trait ItemRepository[T <: Product] extends Repository[T] with LazyLogging {
 
   def select(item: T)(implicit session: DBSession = AutoSession): Option[T] = {
     val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ whereKeysSql(item)

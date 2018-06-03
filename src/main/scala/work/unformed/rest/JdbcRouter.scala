@@ -42,11 +42,11 @@ class JdbcRouter[T <: Product : Meta : Encoder : Decoder](route: PathMatcher[Uni
       complete(StatusCodes.OK, repo.get(id))
     } ~ put {
       entity(as[T]) { item =>
-        complete(StatusCodes.OK, repo.update(item))
+        complete(StatusCodes.OK, repo.modify(item))
       }
     } ~ delete {
       entity(as[T]) { item =>
-        complete(StatusCodes.NoContent, repo.delete(item))
+        complete(StatusCodes.NoContent, repo.remove(item))
       }
     }
   }

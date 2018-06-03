@@ -1,23 +1,23 @@
 package work.unformed.repository.sql
 
-import work.unformed.meta._
+import work.unformed.meta.{DBMapping, _}
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
+import work.unformed.repository.Repository
 
 object ApiRepository {
-  def apply[T <: Product : DBMapping] = new ApiRepository[T]
+  def apply[T <: Product : DBMapping]: ApiRepository[T] = new ApiRepository[T] {override val db: DBMapping[T] = implicitly[DBMapping[T]]}
 }
 
-class ApiRepository[T <: Product : DBMapping] extends LazyLogging {
-  private val db = implicitly[DBMapping[T]]
+trait ApiRepository[T <: Product] extends Repository[T] with LazyLogging {
 
-  def select(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
+  def withQuery(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
     val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort) ++ buildPage(query.page)
     logger.debug("Select query generated: {}", q)
     q.map(rs => db.parse(rs))
   }
 
-  def selectAll(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
+  def withoutPaging(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
     val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort)
     logger.debug("Select without paging generated: {}", q)
     q.map(rs => db.parse(rs))

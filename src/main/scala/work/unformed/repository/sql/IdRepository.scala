@@ -3,14 +3,13 @@ package work.unformed.repository.sql
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
 import work.unformed.meta.DBMapping
-import work.unformed.repository.RepositoryItemNotFound
+import work.unformed.repository.{Repository, RepositoryItemNotFound}
 
 object IdRepository {
-  def apply[T <: Product : DBMapping]: IdRepository[T] = new IdRepository[T]
+  def apply[T <: Product : DBMapping]: IdRepository[T] = new IdRepository[T] { override val db: DBMapping[T] = implicitly[DBMapping[T]] }
 }
 
-class IdRepository[T <: Product : DBMapping] extends LazyLogging {
-  private val db = implicitly[DBMapping[T]]
+trait IdRepository[T <: Product] extends Repository[T] with LazyLogging {
 
   def findById(id: Any)(implicit session: DBSession = AutoSession): Option[T] = {
     val Seq(column) = db.keyColumns

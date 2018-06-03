@@ -5,11 +5,10 @@ import scalikejdbc.{AutoSession, DBSession}
 import work.unformed.meta.DBMapping
 
 object BatchRepository {
-  def apply[T <: Product : DBMapping]: BatchRepository[T] = new BatchRepository[T]
+  def apply[T <: Product : DBMapping]: BatchRepository[T] = new BatchRepository[T] { override val db: DBMapping[T] = implicitly[DBMapping[T]] }
 }
 
-class BatchRepository[T <: Product : DBMapping] extends LazyLogging {
-  private val db = implicitly[DBMapping[T]]
+trait BatchRepository[T <: Product] extends ItemRepository[T] with LazyLogging {
 
   def itemSeq(bindings: Binding*)(implicit session: DBSession = AutoSession): Seq[T] =
     BoundQuery(s"SELECT * FROM ${db.table}")
@@ -41,7 +40,7 @@ class BatchRepository[T <: Product : DBMapping] extends LazyLogging {
   }
 
   def updateSeq(newValues: Seq[T], bindings: Binding*)(implicit session: DBSession = AutoSession): Seq[T] = {
-    delete(bindings:_*)
+    deleteAll(bindings:_*)
     add(newValues)
     itemSeq(bindings:_*)
   }
@@ -50,12 +49,12 @@ class BatchRepository[T <: Product : DBMapping] extends LazyLogging {
     val oldValues = itemSet(bindings:_*)
     db.meta.reconcile(newValues, oldValues)
         .doOnCreated(add)
-        .doOnRemoved(_.foreach(ItemRepository[T].delete))
-        .doOnUpdated(_.foreach(ItemRepository[T].update))
+        .doOnRemoved(_.foreach(delete))
+        .doOnUpdated(_.foreach(update))
     itemSet(bindings:_*)
   }
 
-  def delete(bindings: Binding*)(implicit session: DBSession = AutoSession): Unit =
+  def deleteAll(bindings: Binding*)(implicit session: DBSession = AutoSession): Unit =
     BoundQuery(s"DELETE ${db.table}")
       .where(bindings:_*)
       .execute
