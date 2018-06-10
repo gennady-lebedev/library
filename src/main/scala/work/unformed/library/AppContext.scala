@@ -35,8 +35,10 @@ object AppContext extends LazyLogging with JdbcSupport with CirceSupport {
   }
 
   object DBContext {
-    implicit val itemDb: DBMapping[Item] = new DBMapping[Item](Some("items"))
-    implicit val authorDb: DBMapping[Author] = new DBMapping[Author](Some("authors"))
-    implicit val publisherDb: DBMapping[Publisher] = new DBMapping[Publisher](Some("publishers"))
+    implicit val itemDb: DBMapping[Item] = DBMapping[Item]("items")
+    implicit val authorDb: DBMapping[Author] = DBMapping[Author]("authors")
+    implicit val publisherDb: DBMapping[Publisher] = DBMapping[Publisher]("publishers")
+    implicit val bookDb: DBMapping[BookDB] = DBMapping[BookDB]("books")
+    implicit val bookAuthorDb: DBMapping[BookAuthorDB] = DBMapping[BookAuthorDB]("books_authors")
   }
 }

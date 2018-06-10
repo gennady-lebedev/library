@@ -7,6 +7,10 @@ import work.unformed.meta.Meta.Field
 
 import scala.reflect.runtime.universe.typeOf
 
+object DBMapping {
+  def apply[T <: Product](table: String)(implicit meta: Meta[T]): DBMapping[T] = new DBMapping(Some(table))
+}
+
 class DBMapping[T <: Product]
   (customTable: Option[String] = None, customColumns: Seq[String] = Seq.empty)
   (implicit val meta: Meta[T]) {
