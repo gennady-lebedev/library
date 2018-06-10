@@ -28,7 +28,7 @@ object AppContext extends LazyLogging with JdbcSupport with CirceSupport {
     //new JdbcRouter("items", new JdbcRepository[Item]),
     new JdbcRouter("authors", JdbcRepository[Author]),
     new JdbcRouter("publishers", JdbcRepository[Publisher]),
-  new BookRouter("books", new BookRepository)
+    new BookRouter("books", new BookRepository)
   )
 
   object MetaContext {
