@@ -2,11 +2,13 @@ package work.unformed.library
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import work.unformed.library.model.{Author, Item, Publisher}
+import work.unformed.library.model._
 import work.unformed.repository.JdbcRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.db.JdbcSupport
+import work.unformed.library.book.BookModel.{BookAuthorDB, BookDB, BookDraft}
+import work.unformed.library.book.{BookRepository, BookRouter}
 import work.unformed.rest.{CirceSupport, JdbcRouter}
 import work.unformed.meta.{DBMapping, Meta}
 
@@ -25,13 +27,18 @@ object AppContext extends LazyLogging with JdbcSupport with CirceSupport {
   val router = new RootRouter(
     //new JdbcRouter("items", new JdbcRepository[Item]),
     new JdbcRouter("authors", JdbcRepository[Author]),
-    new JdbcRouter("publishers", JdbcRepository[Publisher])
+    new JdbcRouter("publishers", JdbcRepository[Publisher]),
+  new BookRouter("books", new BookRepository)
   )
 
   object MetaContext {
     implicit val itemMeta: Meta[Item] = new Meta[Item]
     implicit val authorMeta: Meta[Author] = new Meta[Author]
     implicit val publisherMeta: Meta[Publisher] = new Meta[Publisher]
+    implicit val bookMeta: Meta[Book] = new Meta[Book]
+    implicit val bookDraftMeta: Meta[BookDraft] = new Meta[BookDraft]
+    implicit val bookDbMeta: Meta[BookDB] = new Meta[BookDB]
+    implicit val bookAuthorDbMeta: Meta[BookAuthorDB] = new Meta[BookAuthorDB]
   }
 
   object DBContext {

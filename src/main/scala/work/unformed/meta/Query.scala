@@ -1,6 +1,16 @@
 package work.unformed.meta
 
-case class Query[P <: Product](page: Page = Page(), filter: Seq[Filter] = Seq.empty, sort: Seq[Sort] = Seq.empty)
+case class Query[P <: Product](
+  page: Page = Page(),
+  filter: Seq[Filter] = Seq.empty,
+  sort: Seq[Sort] = Seq.empty
+) {
+  def to[T <: Product : Meta]: Query[T] = Query[T](
+    this.page,
+    this.filter.filter(f => implicitly[Meta[T]].fieldNames.contains(f.field)),
+    this.sort.filter(f => implicitly[Meta[T]].fieldNames.contains(f.field))
+  )
+}
 
 object Query {
   def default[P <: Product]: Query[P] = Query()

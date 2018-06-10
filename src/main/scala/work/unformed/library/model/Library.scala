@@ -22,26 +22,6 @@ case class Book (
   authors: Set[Author]
 )
 
-case class BookUI (
-  @Key @Auto id: Long = Defaults.long,
-  title: String,
-  isbn: String,
-  publisherId: Long,
-  authorsId: Set[Long]
-)
-
-case class BookDB (
-  @Key @Auto id: Long = Defaults.long,
-  title: String,
-  isbn: String,
-  publisherId: Long,
-)
-
-case class BookAuthorDB (
-  @Key bookId: Long,
-  @Key authorId: Long
-)
-
 sealed trait UserRole
 object UserRole {
   def valueOf(s: String): UserRole = s match {

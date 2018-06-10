@@ -13,7 +13,7 @@ import work.unformed.meta.Meta.Field
 import scala.reflect.runtime.universe._
 
 trait CirceSupport extends AutoDerivation with FailFastCirceSupport {
-  implicit val configuration: Configuration = Configuration.default.withDefaults.withKebabCaseConstructorNames.withKebabCaseMemberNames
+  implicit val configuration: Configuration = Configuration.default.withDefaults
   implicit val printer: Printer = Printer.noSpaces.copy(dropNullValues = true)
 
 
