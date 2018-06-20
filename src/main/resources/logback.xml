@@ -12,4 +12,5 @@
 
     <logger name="work.unformed.library" level="TRACE"/>
     <logger name="scalikejdbc" level="WARN"/>
+    <logger name="org.apache.kafka" level="WARN"/>
 </configuration>

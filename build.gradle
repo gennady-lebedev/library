@@ -28,6 +28,7 @@ dependencies {
     compile 'org.scalikejdbc:scalikejdbc_2.12:3.0.1'
     compile 'mysql:mysql-connector-java:5.1.46'
     compile 'org.apache.kafka:kafka-clients:1.1.0'
+    compile 'com.typesafe.akka:akka-stream-kafka_2.12:0.21.1'
 
     compile 'com.typesafe.scala-logging:scala-logging_2.12:3.7.2'
     compile 'ch.qos.logback:logback-classic:1.2.3'

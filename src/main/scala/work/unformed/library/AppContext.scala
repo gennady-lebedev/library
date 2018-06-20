@@ -7,12 +7,14 @@ import work.unformed.repository.JdbcRepository
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import work.unformed.db.JdbcSupport
+import work.unformed.kafka.KafkaSample
 import work.unformed.library.book.BookModel.{BookAuthorDB, BookDB, BookDraft}
 import work.unformed.library.book.{BookRepository, BookRouter}
 import work.unformed.rest.{CirceSupport, JdbcRouter}
 import work.unformed.meta.{DBMapping, Meta}
 
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 object AppContext extends LazyLogging with JdbcSupport with CirceSupport {
   val config: Config = ConfigFactory.defaultApplication()
@@ -30,6 +32,11 @@ object AppContext extends LazyLogging with JdbcSupport with CirceSupport {
     new JdbcRouter("publishers", JdbcRepository[Publisher]),
     new BookRouter("books", new BookRepository)
   )
+
+  new KafkaSample().done.onComplete {
+    case Success(a) => logger.info(s"Kafka sample Done: $a")
+    case Failure(_) => logger.info("Kafka sample Failed")
+  }
 
   object MetaContext {
     implicit val itemMeta: Meta[Item] = new Meta[Item]
