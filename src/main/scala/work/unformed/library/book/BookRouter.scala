@@ -11,6 +11,7 @@ import work.unformed.rest.{CirceSupport, Router}
 
 class BookRouter(route: PathMatcher[Unit], repo: BookRepository)(implicit bookMeta: Meta[Book])
   extends QuerySupport with CirceSupport with Router {
+
   override lazy val routes: Route = metaRoute ~ collectionRoutes ~ itemRoutes
 
   private val metaRoute: Route = path(route / "meta") {
@@ -19,7 +20,7 @@ class BookRouter(route: PathMatcher[Unit], repo: BookRepository)(implicit bookMe
     }
   }
 
-  private def collectionRoutes: Route = path(route) {
+  private val collectionRoutes: Route = path(route) {
     get {
       entity(as[Query[Book]]) { query =>
         complete(repo.find(query))
