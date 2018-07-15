@@ -27,7 +27,7 @@ class ItemRouter(
   private val collectionRoutes: Route = path(bookRoute) { bookId =>
     get {
       entity(as[Query[ItemDB]]) { query =>
-        val q = query.copy(filter = query.filter ++ Seq(Filter("bookId", Equals(bookId)))).to[ItemDB]
+        val q = query.copy(filter = query.filter.filter(_.field != "bookId") ++ Seq(Filter("bookId", Equals(bookId)))).to[ItemDB]
         complete(repo.find(q))
       }
     } ~ post {
