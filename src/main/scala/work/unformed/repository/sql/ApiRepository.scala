@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.Source
 import work.unformed.meta.{DBMapping, _}
 import com.typesafe.scalalogging.LazyLogging
-import scalikejdbc.{AutoSession, DBSession}
+import scalikejdbc.{AutoSession, DB, DBSession}
 import work.unformed.repository.Repository
 
 object ApiRepository {
@@ -33,10 +33,12 @@ trait ApiRepository[T <: Product] extends Repository[T] with LazyLogging {
   }
 
   def stream(query: Query[T]): Source[Result[T], NotUsed] = {
-    val c = count(query)
-    val base = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort)
-    Source(0 to c.toInt by streamBatchSize).map { i =>
-      Result(base ++ buildPage(Page(streamBatchSize, i)) map db.parse, query, c)
+    DB localTx { implicit session =>
+      val c = count(query)
+      val base = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort)
+      Source(0 to c.toInt by streamBatchSize).map { i =>
+        Result(base ++ buildPage(Page(streamBatchSize, i)) map db.parse, query, c)
+      }
     }
   }
 
