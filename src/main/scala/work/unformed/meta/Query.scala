@@ -19,8 +19,8 @@ object Query {
 case class Page(limit: Long = Page.defaultLimit, offset: Long = Page.defaultOffset)
 
 object Page {
-  val defaultLimit = 50
-  val defaultOffset = 0
+  val defaultLimit: Long = 50
+  val defaultOffset: Long = 0
 }
 
 case class Filter(field: String, condition: Predicate) {

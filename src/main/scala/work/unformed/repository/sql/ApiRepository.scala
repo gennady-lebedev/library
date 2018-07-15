@@ -35,7 +35,7 @@ trait ApiRepository[T <: Product] extends Repository[T] with LazyLogging {
   def stream(query: Query[T]): Source[Result[T], NotUsed] = {
     val c = count(query)
     val base = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort)
-    Source(0 to c by streamBatchSize).map { i =>
+    Source(0 to c.toInt by streamBatchSize).map { i =>
       Result(base ++ buildPage(Page(streamBatchSize, i)) map db.parse, query, c)
     }
   }
