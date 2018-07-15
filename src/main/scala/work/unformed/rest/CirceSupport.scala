@@ -8,6 +8,8 @@ import work.unformed.meta._
 import java.sql.{Date, Time, Timestamp}
 
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
+import work.unformed.library.item.ItemStatus
+import work.unformed.library.model.UserRole
 import work.unformed.meta.Meta.Field
 
 import scala.reflect.runtime.universe._
@@ -20,6 +22,11 @@ trait CirceSupport extends AutoDerivation with FailFastCirceSupport {
   implicit val timestampFormat: Encoder[Timestamp] with Decoder[Timestamp] = new Encoder[Timestamp] with Decoder[Timestamp] {
     override def apply(a: Timestamp): Json = Encoder.encodeString.apply(a.toString)
     override def apply(c: HCursor): Result[Timestamp] = Decoder.decodeString.map(Timestamp.valueOf).apply(c)
+  }
+
+  implicit val dateFormat: Encoder[Date] with Decoder[Date] = new Encoder[Date] with Decoder[Date] {
+    override def apply(a: Date): Json = Encoder.encodeString.apply(a.toString)
+    override def apply(c: HCursor): Result[Date] = Decoder.decodeString.map(Date.valueOf).apply(c)
   }
 
   implicit val filterEncoder: Encoder[Filter] = new Encoder[Filter] {
@@ -54,5 +61,15 @@ trait CirceSupport extends AutoDerivation with FailFastCirceSupport {
       }
       EntityMeta(a.typeName, f).asJson
     }
+  }
+
+  implicit val itemStatusFormat: Encoder[ItemStatus] with Decoder[ItemStatus] = new Encoder[ItemStatus] with Decoder[ItemStatus] {
+    override def apply(a: ItemStatus): Json = Encoder.encodeString.apply(a.toString)
+    override def apply(c: HCursor): Result[ItemStatus] = Decoder.decodeString.map(ItemStatus.valueOf).apply(c)
+  }
+
+  implicit val userRoleFormat: Encoder[UserRole] with Decoder[UserRole] = new Encoder[UserRole] with Decoder[UserRole] {
+    override def apply(a: UserRole): Json = Encoder.encodeString.apply(a.toString)
+    override def apply(c: HCursor): Result[UserRole] = Decoder.decodeString.map(UserRole.valueOf).apply(c)
   }
 }
