@@ -16,7 +16,7 @@ object Query {
   def default[P <: Product]: Query[P] = Query()
 }
 
-case class Page(limit: Int = Page.defaultLimit, offset: Int = Page.defaultOffset)
+case class Page(limit: Long = Page.defaultLimit, offset: Long = Page.defaultOffset)
 
 object Page {
   val defaultLimit = 50

@@ -15,10 +15,7 @@ trait QuerySupport extends LazyLogging {
   implicit def queryUnmarshaller[T <: Product : Meta]: FromRequestUnmarshaller[Query[T]] = Unmarshaller.strict { ctx =>
     val params = ctx.uri.query().toMap
 
-    val page = Page(
-      params.get("limit").map(_.toInt).getOrElse(Page.defaultLimit),
-      params.get("offset").map(_.toInt).getOrElse(Page.defaultOffset)
-    )
+    val page = Page(params.get("limit").map(_.toInt).getOrElse(Page.defaultLimit), params.get("offset").map(_.toInt).getOrElse(Page.defaultOffset))
     val filters = parseFilters(ctx.uri.query().toMultiMap)
     val sort = params.get("sort") match {
       case Some(param) => parseSorting(param)

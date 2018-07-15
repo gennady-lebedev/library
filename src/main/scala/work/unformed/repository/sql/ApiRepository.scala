@@ -1,5 +1,7 @@
 package work.unformed.repository.sql
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
 import work.unformed.meta.{DBMapping, _}
 import com.typesafe.scalalogging.LazyLogging
 import scalikejdbc.{AutoSession, DBSession}
@@ -10,23 +12,32 @@ object ApiRepository {
 }
 
 trait ApiRepository[T <: Product] extends Repository[T] with LazyLogging {
+  val streamBatchSize = 1000
 
   def withQuery(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
     val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort) ++ buildPage(query.page)
     logger.debug("Select query generated: {}", q)
-    q.map(rs => db.parse(rs))
+    q map db.parse
   }
 
   def withoutPaging(query: Query[T])(implicit session: DBSession = AutoSession): Seq[T] = {
     val q = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort)
     logger.debug("Select without paging generated: {}", q)
-    q.map(rs => db.parse(rs))
+    q map db.parse
   }
 
   def count(query: Query[T])(implicit session: DBSession = AutoSession): Long = {
     val q = BoundQuery(s"SELECT count(1) total FROM ${db.table}") ++ buildWhere(query.filter)
     logger.debug("Count query generated: {}", q)
     q.get(rs => rs.long("total"))
+  }
+
+  def stream(query: Query[T]): Source[Result[T], NotUsed] = {
+    val c = count(query)
+    val base = BoundQuery(s"SELECT * FROM ${db.table}") ++ buildWhere(query.filter) ++ buildOrderBy(query.sort)
+    Source(0 to c by streamBatchSize).map { i =>
+      Result(base ++ buildPage(Page(streamBatchSize, i)) map db.parse, query, c)
+    }
   }
 
   private def buildWhere(filters: Seq[Filter]): BoundQuery = {
