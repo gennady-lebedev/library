@@ -6,6 +6,8 @@ import work.unformed.library.model.{Author, Book, Publisher}
 import work.unformed.meta.{DBMapping, Meta, Query, Result}
 import work.unformed.repository.sql._
 
+import scala.language.implicitConversions
+
 class BookRepository(implicit
   bookDb: DBMapping[BookDB],
   authorDb: DBMapping[Author],
